@@ -31,8 +31,6 @@
     <contact>
         <exclude body1="base_link" body2="link1"/>
         <exclude body1="link1"     body2="link2"/>
-        <exclude body1="target"    body2="link6"/>
-        <exclude body1="target"    body2="ball"/>
         <exclude body1="ball"      body2="link6"/>
     </contact>
 
