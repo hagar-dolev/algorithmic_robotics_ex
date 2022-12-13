@@ -3,7 +3,7 @@ from mujoco.glfw import glfw
 import numpy as np
 import os
 
-xml_path = '2D R arm.xml' #xml file (assumes this is in the same folder as this file)
+xml_path = '2D R arm.xml'  # xml file (assumes this is in the same folder as this file)
 
 # For callback functions
 button_left = False
@@ -13,21 +13,25 @@ lastx = 0
 lasty = 0
 
 N = 400
-q = [np.linspace(0, 1.57, N), np.linspace(0, -2*np.pi, N)]
+q = [np.linspace(0, np.pi/2, N), np.linspace(0, -2 * np.pi, N)]
+
 
 def init_controller(model, data):
-    #initial joints' position
+    # initial joints' position
     data.qpos[0] = q[0][0]
     data.qpos[1] = q[1][0]
 
+
 def controller(model, data):
-    #put the controller here. This function is called inside the simulation.
+    # put the controller here. This function is called inside the simulation.
     pass
+
 
 def keyboard(window, key, scancode, act, mods):
     if act == glfw.PRESS and key == glfw.KEY_BACKSPACE:
         mj.mj_resetData(model, data)
         mj.mj_forward(model, data)
+
 
 def mouse_button(window, button, act, mods):
     # update button state
@@ -44,6 +48,7 @@ def mouse_button(window, button, act, mods):
 
     # update mouse position
     glfw.get_cursor_pos(window)
+
 
 def mouse_move(window, xpos, ypos):
     # compute mouse displacement, save
@@ -84,22 +89,24 @@ def mouse_move(window, xpos, ypos):
     else:
         action = mj.mjtMouse.mjMOUSE_ZOOM
 
-    mj.mjv_moveCamera(model, action, dx/height, dy/height, scene, cam)
+    mj.mjv_moveCamera(model, action, dx / height, dy / height, scene, cam)
+
 
 def scroll(window, xoffset, yoffset):
     action = mj.mjtMouse.mjMOUSE_ZOOM
     mj.mjv_moveCamera(model, action, 0.0, -0.05 * yoffset, scene, cam)
 
-#get the full path
+
+# get the full path
 dirname = os.path.dirname(__file__)
 abspath = os.path.join(dirname + "/" + xml_path)
 xml_path = abspath
 
 # MuJoCo data structures
 model = mj.MjModel.from_xml_path(xml_path)  # MuJoCo model
-data = mj.MjData(model)                     # MuJoCo data
-cam = mj.MjvCamera()                        # Abstract camera
-opt = mj.MjvOption()                        # visualization options
+data = mj.MjData(model)  # MuJoCo data
+cam = mj.MjvCamera()  # Abstract camera
+opt = mj.MjvOption()  # visualization options
 
 # Init GLFW, create window, make OpenGL context current, request v-sync
 glfw.init()
@@ -121,12 +128,11 @@ glfw.set_scroll_callback(window, scroll)
 
 cam.distance = 4
 
-#initialize the controller
+# initialize the controller
 init_controller(model, data)
 
-#set the controller
+# set the controller
 mj.set_mjcb_control(controller)
-
 
 i = 0
 time = 0
@@ -135,7 +141,7 @@ dt = 0.001
 while not glfw.window_should_close(window):
     time_prev = time
 
-    while (time - time_prev < 1.0/60.0 and i < N):
+    while (time - time_prev < 1.0 / 60.0 and i < N):
         data.qpos[0] = q[0][i]
         data.qpos[1] = q[1][i]
         mj.mj_forward(model, data)
@@ -147,7 +153,6 @@ while not glfw.window_should_close(window):
     # get framebuffer viewport
     viewport_width, viewport_height = glfw.get_framebuffer_size(window)
     viewport = mj.MjrRect(0, 0, viewport_width, viewport_height)
-
 
     # Update scene and render
     mj.mjv_updateScene(model, data, opt, None, cam, mj.mjtCatBit.mjCAT_ALL.value, scene)
